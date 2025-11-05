@@ -10,7 +10,7 @@ import {
 
 type ButtonProps = {
   children?: ReactElement | string;
-  addClasses: {
+  addClasses?: {
     button?: string;
     disabled?: string;
     primary?: string;
