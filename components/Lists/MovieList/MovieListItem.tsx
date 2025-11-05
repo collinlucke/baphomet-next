@@ -82,7 +82,7 @@ export const MovieListItem: React.FC<MovieListItemProps> = ({ movie }) => {
                   text-3xl sm:text-4xl lg:text-5xl xl:text-5xl
                 "
                 style={{
-                  WebkitTextStroke: "1px #1e3a8a", // replace with baseColors.primary[700]
+                  WebkitTextStroke: "1px #1e3a8a",
                   paintOrder: "stroke fill",
                 }}
               >
@@ -98,7 +98,7 @@ export const MovieListItem: React.FC<MovieListItemProps> = ({ movie }) => {
                   text-xl sm:text-2xl lg:text-3xl xl:text-4xl
                 "
                 style={{
-                  WebkitTextStroke: "1px #1e3a8a", // replace with baseColors.primary[700]
+                  WebkitTextStroke: "1px #1e3a8a",
                   paintOrder: "stroke fill",
                 }}
               >
