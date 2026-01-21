@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { Button } from "../Buttons/Button";
+import { Button } from "athameui";
 
 type AccordionListItemProps = {
   title: string;
@@ -88,7 +88,7 @@ export const AccordionListItem: React.FC<AccordionListItemProps> = ({
       data-testid={dataTestId}
     >
       <Button
-        addClasses={{
+        className={{
           button: `w-full px-5 py-4 bg-transparent border-0 flex justify-between items-center cursor-pointer text-lg font-medium text-primary-500 text-left transition-colors ease-out hover:bg-tertiary-50 hover:text-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-400 active:scale-100
           ${addClasses.header || ""} 
           ${
@@ -132,7 +132,7 @@ export const AccordionListItem: React.FC<AccordionListItemProps> = ({
       >
         <div
           ref={contentRef}
-          className={`bn-accordion-content py-3.5 pr-1.25 pl-10  text-tertiary-50 ${
+          className={`bn-accordion-content py-3.5 pr-1.25 pl-10 text-tertiary-50 ${
             addClasses.content || ""
           }`}
           id={`accordion-content-${dataTestId || "default"}`}

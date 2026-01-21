@@ -1,13 +1,6 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Header } from "@/components/Header";
 import "./globals.css";
-
-import { Heading } from "@/components/Heading";
-
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Baphomet Next App",
@@ -21,8 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${montserrat.variable} antialiased w-full`}>
-        <Heading />
+      <body
+        className="antialiased w-full overflow-x-hidden"
+        suppressHydrationWarning
+      >
+        <Header />
         {children}
       </body>
     </html>

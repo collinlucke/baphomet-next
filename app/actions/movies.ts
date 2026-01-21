@@ -1,6 +1,6 @@
 "use server";
 
-import { db } from "@/app/mongo";
+import { db } from "@/app/api/mongo";
 
 export type Movie = {
   id: string;
@@ -16,10 +16,17 @@ export type MoviesResponse = {
   total?: number;
 };
 
-export async function getMoviesPaginated(
+export type MoviesPaginatedParams = {
+  skip?: number;
+  limit?: number;
+  sortBy?: "winningPercentage" | "title" | "releaseDate";
+};
+
+export async function getMoviesPaginated({
   skip = 0,
-  limit = 36
-): Promise<MoviesResponse> {
+  limit = 36,
+  sortBy = "title",
+}: MoviesPaginatedParams): Promise<MoviesResponse> {
   try {
     const movies = await db
       .collection("movies")
@@ -33,13 +40,16 @@ export async function getMoviesPaginated(
             winningPercentage: 1,
             tmdbId: 1,
           },
-        }
+        },
       )
       .skip(skip)
       .limit(limit)
+      .sort({
+        [sortBy]: sortBy === "winningPercentage" ? -1 : 1,
+        _id: 1,
+      })
       .toArray();
 
-    // Get total count for pagination info (only on first load to avoid extra queries)
     const totalCount =
       skip === 0 ? await db.collection("movies").countDocuments() : null;
 
@@ -51,7 +61,6 @@ export async function getMoviesPaginated(
       };
     }) as Movie[];
 
-    // Calculate hasMore
     const hasMore = totalCount
       ? skip + formatMovies.length < totalCount
       : formatMovies.length === limit;

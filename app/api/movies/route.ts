@@ -1,4 +1,4 @@
-import { db } from "@/app/mongo";
+import { db } from "@/app/api/mongo";
 
 export async function GET() {
   try {

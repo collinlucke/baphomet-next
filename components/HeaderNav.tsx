@@ -1,28 +1,28 @@
+"use client";
 import Link from "next/link";
-import { Button } from "@/components/Buttons/Button";
-import { ButtonGroup } from "@/components/Buttons/ButtonGroup";
+import { Button, ButtonGroup } from "athameui";
 
-export const HeadingNav = () => {
+export const HeaderNav = () => {
   return (
     <nav>
       <ButtonGroup>
         <Link href="/arena">
-          <Button variant="ghost" size="small">
+          <Button variant="ghostOnDark" size="small">
             Arena
           </Button>
         </Link>
         <Link href="/leaderboard">
-          <Button variant="ghost" size="small">
+          <Button variant="ghostOnDark" size="small">
             Leaderboard
           </Button>
         </Link>
         <Link href="/all-movies">
-          <Button variant="ghost" size="small">
+          <Button variant="ghostOnDark" size="small">
             All Movies
           </Button>
         </Link>
         <Link href="/faq">
-          <Button variant="ghost" size="small">
+          <Button variant="ghostOnDark" size="small">
             FAQ
           </Button>
         </Link>

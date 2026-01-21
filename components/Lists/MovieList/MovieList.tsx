@@ -19,7 +19,7 @@ type Movie = {
 };
 
 type MovieData = {
-  movies?: Movie[] | null; // Make optional for backward compatibility
+  movies?: Movie[] | null;
   searchTerm?: string;
   totalMovieCount?: string;
   showSearch?: boolean;
@@ -34,53 +34,48 @@ type MovieData = {
 };
 
 export const MovieList: React.FC<MovieData> = ({
-  movies: externalMovies, // Optional external movies prop
+  movies: externalMovies,
+  sortBy = "title",
   onLoadMore: externalOnLoadMore,
   isLoadingMore: externalIsLoadingMore = false,
   hasMore: externalHasMore = false,
 }) => {
-  // Internal state for when component manages its own data
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const [internalMovies, setInternalMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
-  // Determine if we're managing data internally or using external props
   const isInternalMode = !externalMovies && !externalOnLoadMore;
   const movies = isInternalMode ? internalMovies : externalMovies;
   const isLoadingMore = isInternalMode ? loadingMore : externalIsLoadingMore;
   const hasMoreItems = isInternalMode ? hasMore : externalHasMore;
 
-  const fetchMovies = useCallback(
-    async (skip = 0, append = false) => {
-      try {
-        if (append) {
-          setLoadingMore(true);
-        } else {
-          setLoading(true);
-        }
-
-        const response = await getMoviesPaginated(skip, 36);
-
-        if (append) {
-          setInternalMovies((prev) => [...prev, ...response.movies]);
-        } else {
-          setInternalMovies(response.movies);
-        }
-
-        setHasMore(response.hasMore);
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-        setLoadingMore(false);
+  const fetchMovies = useCallback(async (skip = 0, append = false) => {
+    try {
+      if (append) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
       }
-    },
-    []
-  );
+
+      const response = await getMoviesPaginated({ skip, limit: 36, sortBy });
+
+      if (append) {
+        setInternalMovies((prev) => [...prev, ...response.movies]);
+      } else {
+        setInternalMovies(response.movies);
+      }
+
+      setHasMore(response.hasMore);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, []);
 
   const loadMore = () => {
     if (!loadingMore && hasMore && internalMovies) {
@@ -108,7 +103,7 @@ export const MovieList: React.FC<MovieData> = ({
       },
       {
         root: null,
-        rootMargin: "100px", // Start loading 100px before the sentinel comes into view
+        rootMargin: "100px",
         threshold: 0.1,
       }
     );
@@ -125,7 +120,6 @@ export const MovieList: React.FC<MovieData> = ({
     };
   }, [handleLoadMore, hasMoreItems, isLoadingMore]);
 
-  // Show loading state for initial load in internal mode
   if (isInternalMode && loading) {
     return (
       <div className="w-full" data-testid="baph-movie-list">
@@ -166,7 +160,6 @@ export const MovieList: React.FC<MovieData> = ({
         ))}
       </List>
 
-      {/* Loading indicator */}
       {isLoadingMore && (
         <div className="flex justify-center items-center py-8">
           <div className="text-tertiary-50 text-lg animate-pulse">
@@ -175,7 +168,6 @@ export const MovieList: React.FC<MovieData> = ({
         </div>
       )}
 
-      {/* End of list indicator */}
       {!hasMoreItems && movies.length > 0 && (
         <div className="flex justify-center items-center py-8">
           <div className="text-tertiary-300 text-sm opacity-60">
@@ -184,116 +176,9 @@ export const MovieList: React.FC<MovieData> = ({
         </div>
       )}
 
-      {/* Intersection observer sentinel */}
       {hasMoreItems && !isLoadingMore && (
         <div ref={sentinelRef} className="h-4 w-full" aria-hidden="true" />
       )}
     </div>
   );
 };
-
-// const baphStyles: { [key: string]: CSSObject } = {
-//   sentinel: {
-//     height: "1px",
-//     width: "100%",
-//     backgroundColor: "transparent",
-//   },
-
-//   searchForm: {
-//     position: "sticky",
-//     zIndex: 10,
-//     top: 0,
-//     padding: "35px 0",
-//     justifyContent: "end",
-//     "&:after": {
-//       content: '""',
-//       display: "block",
-//       width: "100vw",
-//       height: "-webkit-fill-available",
-//       position: "absolute",
-//       top: 0,
-//       right: "50%",
-//       transform: "translateX(50%)",
-
-//       zIndex: -1,
-//       backdropFilter: "blur(50px)",
-//       WebkitBackdropFilter: "blur(50px)",
-//     },
-//   },
-//   noResults: {
-//     display: "flex",
-//     flexDirection: "column" as const,
-//     alignItems: "center",
-//     marginBottom: "30px",
-//     marginTop: "30px",
-//     color: baphColorVariations.tertiary[50],
-//   },
-//   list: {
-//     display: "grid",
-//     gap: "15px",
-//     listStyleType: "none",
-//     paddingInlineStart: 0,
-//     margin: 0,
-//     width: "100%",
-//     gridTemplateColumns: "repeat(auto-fit, minmax(90px, 1fr))",
-//     [mediaQueries.minWidth.md]: {
-//       gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))",
-//       gap: "20px",
-//     },
-//     [mediaQueries.minWidth.lg]: {
-//       gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
-//       gap: "25px",
-//     },
-//     [mediaQueries.minWidth.xl]: {
-//       gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-//       gap: "35px",
-//     },
-//   },
-//   movieListWrapper: {
-//     display: "flex",
-//     flexDirection: "column" as const,
-//     width: "100%",
-//   },
-//   searchWrapper: {
-//     position: "relative" as const,
-//     backgroundColor: "transparent",
-//     top: 0,
-//     maxWidth: "1024px",
-//   },
-//   resultsText: {
-//     color: baphColorVariations.tertiary[50],
-//   },
-//   loadingContainer: {
-//     display: "flex",
-//     justifyContent: "center",
-//     alignItems: "center",
-//     padding: "2rem",
-//     marginTop: "2rem",
-//   },
-//   loadingText: {
-//     color: baseColors.tertiary[50],
-//     fontSize: "1.1rem",
-//     fontWeight: "bold",
-//     opacity: 0.8,
-//     "@keyframes pulse": {
-//       "0%": { opacity: 0.4 },
-//       "50%": { opacity: 1 },
-//       "100%": { opacity: 0.4 },
-//     },
-//     animation: "pulse 2s infinite",
-//   },
-//   endContainer: {
-//     display: "flex",
-//     justifyContent: "center",
-//     alignItems: "center",
-//     padding: "3rem 2rem",
-//     marginTop: "2rem",
-//   },
-//   endText: {
-//     color: baseColors.tertiary[50],
-//     fontSize: "1.2rem",
-//     fontWeight: "bold",
-//     opacity: 0.6,
-//     textAlign: "center" as const,
-//   },
-// };
